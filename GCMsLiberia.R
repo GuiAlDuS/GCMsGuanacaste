@@ -2,7 +2,7 @@ library(tidyverse)
 library(lubridate)
 setwd("~/OneDrive/Guillermo/GCMsClimaLiberia")
 
-liberiaGCMs <- read_csv("data.csv")
+liberiaGCMs <- read_csv("dataLiberia.csv")
 
 #ver variables
 eje1 <- liberiaGCMs %>% group_by(Variable) %>% summarise(nmros = n())
@@ -75,10 +75,9 @@ tasmax_mensual <- liberiaGCMs %>%
   summarise(tasmax_aNo = mean (Value))
  
 ggplot(tasmax_mensual, aes(x=mes, y=tasmax_aNo, color=Scenario, group=Scenario)) + 
-  geom_line() + 
   stat_smooth(method="loess", level=.8)
-
-
+  #agregar línea de promedio histórico
+  #ver cómo la variabilidad mensual va cambiando con los años (eje y = variabilidad mensual)
 
 ###Convertir archivos
 datos1 <- read_tsv("DatosPocosol_10agosto2017.txt", skip=2, col_names = FALSE, col_types = cols(.default = col_character()))
