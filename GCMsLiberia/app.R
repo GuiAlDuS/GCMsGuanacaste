@@ -35,7 +35,7 @@ server <- function(input,output) {
   output$grafico <- renderPlot({
     seleccion <- anual_GCMs %>% filter(Scenario == input$CPath & aNo >= input$Year[1] & aNo <= input$Year[2])
     ggplot(seleccion, aes(x = as.integer(aNo), y = tasmax)) + 
-      geom_line(aes(color = Model)) + stat_smooth(method="loess", level=.8)
+      geom_line(aes(color = Model)) + stat_smooth(method="loess", level=0.8)
   })
 }
 
