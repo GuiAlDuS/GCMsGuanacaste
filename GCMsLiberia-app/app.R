@@ -37,17 +37,18 @@ ui <- fluidPage(
 
 server <- function(input,output) {
   output$graficoTmax <- renderPlot({
-    seleccion <- anual_GCMs %>% filter(Scenario == input$CPath & aNo >= input$Year[1] & aNo <= input$Year[2] & Model %in% input$GCMs)
+    seleccion <- anual_GCMs %>% 
+      filter(Scenario == input$CPath & aNo >= input$Year[1] & aNo <= input$Year[2] & Model %in% input$GCMs)
     p1 <- ggplot(seleccion, aes(x = as.integer(aNo), y = tasmax)) + 
       geom_line(aes(color = Model)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "Años", y = "Temperatura máxima (C)")
+      labs(x = "Años", y = "Temp. máxima (C)")
     p2 <- ggplot(seleccion, aes(x = as.integer(aNo), y = tasmin)) + 
       geom_line(aes(color = Model)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "Años", y = "Temperatura mínima (C)")
+      labs(x = "Años", y = "Temp. mínima (C)")
     p3 <- ggplot(seleccion, aes(x = as.integer(aNo), y = pr)) + 
       geom_line(aes(color = Model)) + stat_smooth(method="loess", level=0.8) +
       labs(x = "Años", y = "Lluvia (mm)")
-    grid.arrange(p1,p2,p3, ncol=2)
+    grid.arrange(p1,p2,p3, ncol=1)
   }) 
 }
 
