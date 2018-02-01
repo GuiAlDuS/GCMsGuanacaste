@@ -1,13 +1,9 @@
 library(shiny)
-<<<<<<< HEAD
 library(dplyr)
 library(ggplot2)
 library(gridExtra)
 library(grid)
-=======
-library(tidyverse)
-library(gridExtra)
->>>>>>> 816e96c621999c2ee8985fa2ed40ec5a9414629b
+
 
 anual_GCMs <- readRDS("data/anual_GCMs.rds")
 
@@ -44,7 +40,6 @@ ui <- fluidPage(
                    choices = list("RCP 4.5" = "rcp45",
                                   "RCP 8.5" = "rcp85")),
       
-<<<<<<< HEAD
       sliderInput("Year", "Seleccionar periodo de años:",
                   min = 2000, max = 2100, value = c(2010, 2050), step = 5, sep = ""),
       
@@ -53,12 +48,6 @@ ui <- fluidPage(
       p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25°."),
       br(),
       p("App elaborada en Shiny por Guillermo Durán, HIDROCEC-UNA.")
-=======
-      sliderInput("Year", "Seleccionar periodo de tiempo:",
-                  min = 2000, max = 2100, value = c(2010, 2050), step = 5),
-      
-      p("Nota: Los valores de temperatura son los promedios anuales y los de lluvia son el total anual. Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio de Hidalgo y Alfaro (2015). Datos tomados del set de datos NEX-GDDP de la NASA, con resolución espacial de 0.25°.")
->>>>>>> 816e96c621999c2ee8985fa2ed40ec5a9414629b
       ),
     
     mainPanel(
@@ -75,7 +64,6 @@ server <- function(input,output) {
     
     p1 <- ggplot(seleccion, aes(x = as.integer(aNo), y = tasmax)) + 
       geom_line(aes(color = Modelo)) + stat_smooth(method="loess", level=0.8) +
-<<<<<<< HEAD
       labs(x = "Años", y = "Temperatura (C)") + 
       labs(
         title = paste("Promedio anual de temperatura máxima diaria")
@@ -97,22 +85,7 @@ server <- function(input,output) {
   }, width = "auto", height = 700)
   
   output$grafico2 <- renderPlot({
-    
   })
-=======
-      labs(x = "", y = "Temp. máxima (C)") + 
-      theme(axis.text.x = element_blank())
-    p2 <- ggplot(seleccion, aes(x = as.integer(aNo), y = tasmin)) + 
-      geom_line(aes(color = Modelo)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "", y = "Temp. mínima (C)") +
-      theme(axis.text.x = element_blank())
-    p3 <- ggplot(seleccion, aes(x = as.integer(aNo), y = pr)) + 
-      geom_line(aes(color = Modelo)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "Años", y = "Lluvia (mm)")
-    
-    grid_arrange_shared_legend(p1, p2, p3)
-  }, width = "auto", height = 700) 
->>>>>>> 816e96c621999c2ee8985fa2ed40ec5a9414629b
 }
 
 shinyApp(ui = ui, server = server)
