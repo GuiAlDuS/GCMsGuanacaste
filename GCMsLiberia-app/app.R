@@ -1,6 +1,8 @@
 library(shiny)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(gridExtra)
+library(grid)
 
 anual_GCMs <- readRDS("data/anual_GCMs.rds")
 
@@ -41,9 +43,10 @@ ui <- fluidPage(
                   min = 2000, max = 2100, value = c(2010, 2050), step = 5, sep = ""),
       
       h5("Nota:"),
-      p("- Valores de temperatura en promedios anuales y lluvia en total anual."),
-      p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio de Hidalgo y Alfaro (2015)."),
-      p("- Datos tomados del set de datos NEX-GDDP de NASA, con resolución espacial de 0.25°.")
+      p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio 'Skill of CMIP5 climate models in reproducing 20th century basic climate features in Central America' (Hidalgo y Alfaro, 2015)."),
+      p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25°."),
+      br(),
+      p("App elaborada en Shiny por Guillermo Durán, HIDROCEC-UNA.")
       ),
     
     mainPanel(
@@ -60,18 +63,29 @@ server <- function(input,output) {
     
     p1 <- ggplot(seleccion, aes(x = as.integer(aNo), y = tasmax)) + 
       geom_line(aes(color = Modelo)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "", y = "Temp. máxima (C)") + 
-      theme(axis.text.x = element_blank())
+      labs(x = "Años", y = "Temperatura (C)") + 
+      labs(
+        title = paste("Promedio anual de temperatura máxima diaria")
+      )
     p2 <- ggplot(seleccion, aes(x = as.integer(aNo), y = tasmin)) + 
       geom_line(aes(color = Modelo)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "", y = "Temp. mínima (C)") +
-      theme(axis.text.x = element_blank())
+      labs(x = "Años", y = "Temperatura (C)") +
+      labs(
+        title = paste("Promedio anual de temperatura mínima diaria")
+      )
     p3 <- ggplot(seleccion, aes(x = as.integer(aNo), y = pr)) + 
       geom_line(aes(color = Modelo)) + stat_smooth(method="loess", level=0.8) +
-      labs(x = "Años", y = "Lluvia (mm)")
+      labs(x = "Años", y = "Lluvia (mm)") + 
+      labs(
+        title = paste("Total de precipitación anual")
+      )
     
     grid_arrange_shared_legend(p1, p2, p3)
-  }, width = "auto", height = 700) 
+  }, width = "auto", height = 700)
+  
+  output$grafico2 <- renderPlot({
+    
+  })
 }
 
 shinyApp(ui = ui, server = server)
