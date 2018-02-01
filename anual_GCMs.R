@@ -33,6 +33,6 @@ tasmin_anual_GCM <- liberiaGCMs %>%
 
 anual_GCMs <- pr_anual_GCM %>% inner_join(tasmax_anual_GCM, by = c("aNo", "Scenario", "Model")) %>% inner_join(tasmin_anual_GCM, by = c("aNo", "Scenario", "Model"))
 
-anual_GCMs <- anual_GCMs %>% rename(pr = pr_GCM, tasmax = tasmax_aNo, tasmin = tasmin_aNo)
+anual_GCMs <- anual_GCMs %>% rename(Modelo = Model, pr = pr_GCM, tasmax = tasmax_aNo, tasmin = tasmin_aNo)
 
 saveRDS(anual_GCMs, "anual_GCMs.rds")
