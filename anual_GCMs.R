@@ -14,19 +14,19 @@ pr_anual_GCM <- liberiaGCMs %>%
   filter(Variable == "pr") %>%
   mutate(mes = format(Date, "%m"), aNo = format(Date, "%Y")) %>% 
   group_by(aNo, Scenario, Model) %>% 
-  summarise(pr_GCM = sum (Value * 86400))
+  summarize(pr_GCM = sum (Value * 86400), prmax_dia = max (Value * 86400))
 
 tasmax_anual_GCM <- liberiaGCMs %>%
   filter(Variable == "tasmax") %>%
   mutate(mes = format(Date, "%m"), aNo = format(Date, "%Y")) %>% 
   group_by(aNo, Scenario, Model) %>% 
-  summarise(tasmax_aNo = mean (Value - 273.15))
+  summarize(tasmax_aNo = mean (Value - 273.15), tasmax_dia = max (Value - 273.15))
 
 tasmin_anual_GCM <- liberiaGCMs %>%
   filter(Variable == "tasmin") %>%
   mutate(mes = format(Date, "%m"), aNo = format(Date, "%Y")) %>% 
   group_by(aNo, Scenario, Model) %>% 
-  summarise(tasmin_aNo = mean (Value - 273.15))
+  summarize(tasmin_aNo = mean (Value - 273.15), tasmin_max_dia = max (Value - 273.15))
 
 anual_GCMs <- pr_anual_GCM %>% inner_join(tasmax_anual_GCM, by = c("aNo", "Scenario", "Model")) %>% inner_join(tasmin_anual_GCM, by = c("aNo", "Scenario", "Model"))
 
@@ -85,4 +85,14 @@ ggplot(anual_TodosGCMs, aes(x=as.integer(aNo), y=pr, color=Scenario, group=Scena
 
 aNo_datos <- anual_TodosGCMs %>% group_by(aNo) %>% summarise(n())
 
-datos_2012 <- anual_TodosGCMs %>% filter(aNo == 2012)
+datos_2039 <- anual_TodosGCMs %>% filter(aNo == 2039)
+
+
+## número de días
+
+p90tmax <- liberiaGCMs %>% 
+  filter(Variable == "tasmax") %>% 
+  mutate(aNo = format(Date, "%Y")) %>%
+  group_by(Model, aNo) %>% 
+  summarize(tmax_aNo = max(Value))
+  mutate(p90max = )
