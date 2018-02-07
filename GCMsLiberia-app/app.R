@@ -5,7 +5,9 @@ library(gridExtra)
 library(grid)
 
 anual_GCMs <- readRDS("data/anual_GCMs.rds")
+mensual_GCMs <- readRDS("data/mensual_GCMs.rds")
 anual_GCMs$aNo <- as.integer(anual_GCMs$aNo)
+mensual_GCMs$aNo <- as.integer(mensual_GCMs$aNo)
 
 grid_arrange_shared_legend <- function(...) {
   plots <- list(...)
@@ -60,24 +62,34 @@ ui <- fluidPage(
 
 server <- function(input,output) {
   output$grafico1 <- renderPlot({
-    #función de selección
+
+#funciones de selección
     seleccionanual <- anual_GCMs %>% 
       filter(Scenario == input$CPath & aNo >= input$Year[1] & aNo <= input$Year[2])
     seleccion <- seleccionanual %>% 
       filter(Modelo %in% input$GCMs)
     
-    #función general del gráfico 
+    seleccionanual_mes <- mensual_GCMs %>% 
+      filter(Scenario == input$CPath & aNo >= input$Year[1] & aNo <= input$Year[2])
+    seleccion_mes <- seleccionanual_mes %>% 
+      filter(Modelo %in% input$GCMs)
+    
+#funciones generales de gráfico 
     grafico <- function(s_Y) {
       ggplot() + 
         geom_line(data = seleccionanual, aes_string(x = "aNo", y = s_Y, group = "Modelo"), colour = alpha("grey", 0.7)) + 
         geom_line(data = seleccion, aes_string(x = "aNo", y = s_Y, colour = "Modelo"))
     }
     
+    grafico_mes <- function(s_Y) {
+      ggplot() + 
+        geom_violin(data = seleccionanual_mes, aes_string(x = "mes", y = s_Y), colour = alpha("grey", 0.7)) +
+        geom_violin(data = seleccion_mes, aes_string(x = "mes", y = s_Y))
+    }
     #selección sin GCMs
     if (is.null(input$GCMs)){
       #todos los gráficos en gris
       p1 <- grafico("tasmax") +
-        stat_smooth(method="loess", level=0.8) +
         labs(x = "Años", y = "Temperatura (C)") + 
         labs(
           title = paste("Promedio de temperatura máxima diaria")
@@ -92,23 +104,27 @@ server <- function(input,output) {
         labs(
           title = paste("Total de precipitación anual")
         )
-      p4 <- grafico("tasmax_dia") +
-        labs(x = "Años", y = "Temperatura (C)") + 
+      p4 <- grafico("TempDif") +
+        labs(x = "Años", y = "Grados celsius (C)") + 
         labs(
-          title = paste("Máxima temperatura diaria por año")
+          title = paste("Promedio del rango de temperatura diaria")
         )
-      p5 <- grafico("tasmin_max_dia") +
-        labs(x = "Años", y = "Temperatura (C)") +
+      p5 <- grafico_mes("tasmax_mes") +
+        labs(x = "Mes", y = "Temperatura (C)") +
         labs(
-          title = paste("Máxima temperatura mínima por año")
+          title = paste("Temperaturas máximas mensuales")
         )
-      p6 <- grafico("prmax_dia") + 
-        stat_smooth(method="loess", level=0.8) +
-        labs(x = "Años", y = "Lluvia (mm)") + 
+      p6 <- grafico_mes("tasmin_mes") + 
+        labs(x = "Mes", y = "Temperatura (C)") +
         labs(
-          title = paste("Máximo de lluvia diario en cada año")
+          title = paste("Temperaturas mínimas mensuales")
         )
-      grid.arrange(p1, p4, p2, p5, p3, p6)
+      p7 <- grafico_mes("pr_mes") +
+        labs(x = "Mes", y = "Lluvia (mm)") +
+        labs(
+          title = paste("Total de lluvias mensuales")
+        )
+      grid.arrange(p1, p2, p4, p3, p5, p6, p7)
     } else if (input$loess == T) {  #con tendencia seleccionada
       p1 <- grafico("tasmax") +
         stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "tasmax")) +
@@ -128,25 +144,28 @@ server <- function(input,output) {
         labs(
           title = paste("Total de precipitación anual")
         )
-      p4 <- grafico("tasmax_dia") +
-        stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "tasmax_dia")) +
-        labs(x = "Años", y = "Temperatura (C)") + 
+      p4 <- grafico("TempDif") +
+        stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "TempDif")) +
+        labs(x = "Años", y = "Grados celsius (C)") + 
         labs(
-          title = paste("Máxima temperatura diaria por año")
+          title = paste("Promedio del rango de temperatura diaria")
         )
-      p5 <- grafico("tasmin_max_dia") +
-        labs(x = "Años", y = "Temperatura (C)") +
-        stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "tasmin_max_dia")) +
+      p5 <- grafico_mes("tasmax_mes") +
+        labs(x = "Mes", y = "Temperatura (C)") +
         labs(
-          title = paste("Máxima temperatura mínima por año")
+          title = paste("Temperaturas máximas mensuales")
         )
-      p6 <- grafico("prmax_dia") + 
-        stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "prmax_dia")) +
-        labs(x = "Años", y = "Lluvia (mm)") + 
+      p6 <- grafico_mes("tasmin_mes") + 
+        labs(x = "Mes", y = "Temperatura (C)") +
         labs(
-          title = paste("Máximo de lluvia diario en cada año")
+          title = paste("Temperaturas mínimas mensuales")
         )
-      grid_arrange_shared_legend(p1, p4, p2, p5, p3, p6)
+      p7 <- grafico_mes("pr_mes") +
+        labs(x = "Mes", y = "Lluvia (mm)") +
+        labs(
+          title = paste("Total de lluvias mensuales")
+        )
+      grid_arrange_shared_legend(p1, p2, p4, p3, p5, p6, p7)
     } else {  #sin tendencia
     p1 <- grafico("tasmax") +
       stat_smooth(method="loess", level=0.8) +
@@ -164,25 +183,29 @@ server <- function(input,output) {
       labs(
         title = paste("Total de precipitación anual")
       )
-    p4 <- grafico("tasmax_dia") +
-      labs(x = "Años", y = "Temperatura (C)") + 
+    p4 <- grafico("TempDif") +
+      labs(x = "Años", y = "Grados celsius (C)") + 
       labs(
-        title = paste("Máxima temperatura diaria por año")
+        title = paste("Promedio del rango de temperatura diaria")
       )
-    p5 <- grafico("tasmin_max_dia") +
-      labs(x = "Años", y = "Temperatura (C)") +
+    p5 <- grafico_mes("tasmax_mes") +
+      labs(x = "Mes", y = "Temperatura (C)") +
       labs(
-        title = paste("Máxima temperatura mínima por año")
+        title = paste("Temperaturas máximas mensuales")
       )
-    p6 <- grafico("prmax_dia") + 
-      stat_smooth(method="loess", level=0.8) +
-      labs(x = "Años", y = "Lluvia (mm)") + 
+    p6 <- grafico_mes("tasmin_mes") + 
+      labs(x = "Mes", y = "Temperatura (C)") +
       labs(
-        title = paste("Máximo de lluvia diario en cada año")
+        title = paste("Temperaturas mínimas mensuales")
       )
-    grid_arrange_shared_legend(p1, p4, p2, p5, p3, p6)
+    p7 <- grafico_mes("pr_mes") +
+      labs(x = "Mes", y = "Lluvia (mm)") +
+      labs(
+        title = paste("Total de lluvias mensuales")
+      )
+    grid_arrange_shared_legend(p1, p2, p4, p3, p5, p6, p7)
     }
-    },width = "auto", height = 750)
+    },width = "auto", height = 700)
 }
 
 shinyApp(ui = ui, server = server)

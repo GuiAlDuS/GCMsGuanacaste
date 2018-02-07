@@ -96,3 +96,37 @@ p90tmax <- liberiaGCMs %>%
   group_by(Model, aNo) %>% 
   summarize(tmax_aNo = max(Value))
   mutate(p90max = )
+  
+
+#estacionalidad
+#hacer por meses
+
+tasmax_mensual <- liberiaGCMs %>%
+  filter(Variable == "tasmax") %>%
+  mutate(mes = format(Date, "%m"), aNo = format(Date, "%Y")) %>% 
+  group_by(mes, aNo, Scenario, Model) %>% 
+  summarize(tasmax_mes = mean (Value - 273.15))
+
+tasmin_mensual <- liberiaGCMs %>%
+  filter(Variable == "tasmin") %>%
+  mutate(mes = format(Date, "%m"), aNo = format(Date, "%Y")) %>% 
+  group_by(mes, aNo, Scenario, Model) %>% 
+  summarize(tasmin_mes = mean (Value - 273.15))
+
+pr_mensual <- liberiaGCMs %>% 
+  filter(Variable == "pr") %>%
+  mutate(mes = format(Date, "%m"), aNo = format(Date, "%Y")) %>% 
+  group_by(mes, aNo, Scenario, Model) %>% 
+  summarize(pr_mes = sum (Value * 86400))
+
+mensual_GCMs <- pr_mensual %>% inner_join(tasmax_mensual, by = c("aNo", "mes", "Scenario", "Model")) %>% inner_join(tasmin_mensual, by = c("aNo", "mes", "Scenario", "Model"))
+
+mensual_GCMs <- mensual_GCMs %>% rename(Modelo = Model)
+
+saveRDS(mensual_GCMs, "mensual_GCMs.rds")
+
+
+
+ggplot(pr_mensual, aes(x=mes, y=pr_mes)) + geom_violin() + scale_y_log10()
+
+ggplot(tasmax_mensual, aes(x=mes,y=tasmax_mes)) + geom_violin() + stat_summary(fun.y=median, geom="point", size=2, color="red")
