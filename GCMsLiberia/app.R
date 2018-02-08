@@ -27,7 +27,9 @@ ui <- fluidPage(
 
 
 server <- function(input,output) {
-  
+  output$grafico <- renderPlot(
+    
+  )
 }
 
 shinyApp(ui = ui, server = server)
