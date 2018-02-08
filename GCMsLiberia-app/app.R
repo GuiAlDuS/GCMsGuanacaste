@@ -50,6 +50,7 @@ ui <- fluidPage(
       p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio 'Skill of CMIP5 climate models in reproducing 20th century basic climate features in Central America' de Hidalgo y Alfaro (2015)."),
       p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25°."),
       p("- Línea de tendencia calculada por medio de una regresión local (LOESS)."),
+      p("- Los puntos que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, mientras que el gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       br(),
       p("App elaborada en R y Shiny por Guillermo Durán, HIDROCEC-UNA.")
       ),
