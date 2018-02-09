@@ -37,22 +37,23 @@ ui <- fluidPage(
                                         "MRI-CGCM3" = "MRI-CGCM3"),
                        selected = NULL),
       
-      radioButtons("CPath", "Seleccionar esenario:",
+      radioButtons("CPath", "Seleccionar escenario futuro:",
                    choices = list("RCP 4.5" = "rcp45",
                                   "RCP 8.5" = "rcp85")),
       
       sliderInput("Year", "Seleccionar periodo de años:",
-                  min = 2000, max = 2100, value = c(2010, 2050), step = 5, sep = ""),
+                  min = 2020, max = 2100, value = c(2030, 2050), step = 5, sep = ""),
       
       checkboxInput("loess", "Mostrar línea de tendencia para los GCMs seleccionados.", value = F),
       br(),
       h5("Nota:"),
       p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio 'Skill of CMIP5 climate models in reproducing 20th century basic climate features in Central America' de Hidalgo y Alfaro (2015)."),
-      p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25°."),
+      p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25° x 0.25° ~ 25km x 25km."),
       p("- Línea de tendencia calculada por medio de una regresión local (LOESS)."),
       p("- Los puntos que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, mientras que el gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       br(),
-      p("App elaborada en R y Shiny por Guillermo Durán, HIDROCEC-UNA.")
+      p("App elaborada en R-Shiny por Guillermo Durán, HIDROCEC-UNA."),
+      p("Última actualización 9-2-2018.")
       ),
     
     mainPanel(
@@ -78,50 +79,58 @@ server <- function(input,output) {
 #funciones generales de gráfico 
     grafico <- function(s_Y) {
       ggplot() + 
-        geom_line(data = seleccionanual, aes_string(x = "aNo", y = s_Y, group = "Modelo"), colour = alpha("grey", 0.7)) + 
         geom_line(data = seleccion, aes_string(x = "aNo", y = s_Y, colour = "Modelo"))
+    }
+    
+    grafico_gris <- function(s_Y) {
+      ggplot() +
+      geom_line(data = seleccionanual, aes_string(x = "aNo", y = s_Y, group = "Modelo"), colour = alpha("grey", 0.7))
     }
     
     grafico_mes <- function(s_Y) {
       ggplot() + 
-        geom_violin(data = seleccionanual_mes, aes_string(x = "mes", y = s_Y), colour = alpha("grey", 0.7)) +
         geom_violin(data = seleccion_mes, aes_string(x = "mes", y = s_Y)) +
         stat_summary(data = seleccion_mes, fun.y = "median", aes_string(x = "mes", y = s_Y, colour = "Modelo"), size = 2, geom = "point")
+    }
+    
+    grafico_mes_gris <- function(s_Y) {
+      ggplot() + 
+      geom_violin(data = seleccionanual_mes, aes_string(x = "mes", y = s_Y), colour = alpha("grey", 0.7))
     }
     #selección sin GCMs
     if (is.null(input$GCMs)){
       #todos los gráficos en gris
-      p1 <- grafico("tasmax") +
+      p1 <- grafico_gris("tasmax") +
         labs(x = "Años", y = "Temperatura (C)") + 
         labs(
           title = paste("Promedio de temperatura máxima diaria")
         )
-      p2 <- grafico("tasmin") +
+      p2 <- grafico_gris("tasmin") +
         labs(x = "Años", y = "Temperatura (C)") +
         labs(
           title = paste("Promedio de temperatura mínima diaria")
         )
-      p3 <- grafico("pr") +
+      p3 <- grafico_gris("pr") +
         labs(x = "Años", y = "Lluvia (mm)") + 
         labs(
           title = paste("Total de precipitación anual")
         )
-      p4 <- grafico("TempDif") +
+      p4 <- grafico_gris("TempDif") +
         labs(x = "Años", y = "Grados celsius (C)") + 
         labs(
           title = paste("Promedio del rango de temperatura diaria")
         )
-      p5 <- grafico_mes("tasmax_mes") +
+      p5 <- grafico_mes_gris("tasmax_mes") +
         labs(x = "Mes", y = "Temperatura (C)") +
         labs(
           title = paste("Temperaturas máximas mensuales")
         )
-      p6 <- grafico_mes("tasmin_mes") + 
+      p6 <- grafico_mes_gris("tasmin_mes") + 
         labs(x = "Mes", y = "Temperatura (C)") +
         labs(
           title = paste("Temperaturas mínimas mensuales")
         )
-      p7 <- grafico_mes("pr_mes") +
+      p7 <- grafico_mes_gris("pr_mes") +
         labs(x = "Mes", y = "Lluvia (mm)") +
         labs(
           title = paste("Total de lluvias mensuales")
@@ -170,7 +179,6 @@ server <- function(input,output) {
       grid_arrange_shared_legend(p1, p2, p4, p3, p5, p6, p7)
     } else {  #sin tendencia
     p1 <- grafico("tasmax") +
-      stat_smooth(method="loess", level=0.8) +
       labs(x = "Años", y = "Temperatura (C)") + 
       labs(
         title = paste("Promedio de temperatura máxima diaria")
