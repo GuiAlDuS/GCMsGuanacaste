@@ -42,7 +42,7 @@ ui <- fluidPage(
                                   "RCP 8.5" = "rcp85")),
       
       sliderInput("Year", "Seleccionar periodo de años:",
-                  min = 2020, max = 2100, value = c(2030, 2050), step = 5, sep = ""),
+                  min = 2000, max = 2100, value = c(2030, 2050), step = 5, sep = ""),
       
       checkboxInput("loess", "Mostrar línea de tendencia para los GCMs seleccionados.", value = F),
       br(),
