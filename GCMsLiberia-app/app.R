@@ -6,6 +6,7 @@ library(grid)
 
 anual_GCMs <- readRDS("data/anual_GCMs.rds")
 mensual_GCMs <- readRDS("data/mensual_GCMs.rds")
+perc_historico <- readRDS("data/perc_anual_GCMs.rds")
 anual_GCMs$aNo <- as.integer(anual_GCMs$aNo)
 mensual_GCMs$aNo <- as.integer(mensual_GCMs$aNo)
 
@@ -49,6 +50,7 @@ ui <- fluidPage(
       h5("Nota:"),
       p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio 'Skill of CMIP5 climate models in reproducing 20th century basic climate features in Central America' de Hidalgo y Alfaro (2015)."),
       p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25° x 0.25° ~ 25km x 25km."),
+      p("- Las líneas negras horizontales representan el 5 y 95 percentil de los datos históricos modelados (1950 a 2005)."),
       p("- Línea de tendencia calculada por medio de una regresión local (LOESS)."),
       p("- Los puntos que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, mientras que el gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       br(),
@@ -77,14 +79,14 @@ server <- function(input,output) {
       filter(Modelo %in% input$GCMs)
     
 #funciones generales de gráfico 
-    grafico <- function(s_Y) {
+    grafico <- function(s_Y, perc5, perc95) {
       ggplot() + 
         geom_line(data = seleccion, aes_string(x = "aNo", y = s_Y, colour = "Modelo"))
     }
     
-    grafico_gris <- function(s_Y) {
+    grafico_gris <- function(s_Y, perc5, perc95) {
       ggplot() +
-      geom_line(data = seleccionanual, aes_string(x = "aNo", y = s_Y, group = "Modelo"), colour = alpha("grey", 0.7))
+      geom_line(data = seleccionanual, aes_string(x = "aNo", y = s_Y, group = "Modelo"), colour = alpha("grey", 0.8))
     }
     
     grafico_mes <- function(s_Y) {
@@ -101,16 +103,22 @@ server <- function(input,output) {
     if (is.null(input$GCMs)){
       #todos los gráficos en gris
       p1 <- grafico_gris("tasmax") +
+        geom_hline(yintercept = perc_historico$`tasmax_5%`) +
+        geom_hline(yintercept = perc_historico$`tasmax_95%`) +
         labs(x = "Años", y = "Temperatura (C)") + 
         labs(
           title = paste("Promedio de temperatura máxima diaria")
         )
       p2 <- grafico_gris("tasmin") +
+        geom_hline(yintercept = perc_historico$`tasmin_5%`) +
+        geom_hline(yintercept = perc_historico$`tasmin_95%`) +
         labs(x = "Años", y = "Temperatura (C)") +
         labs(
           title = paste("Promedio de temperatura mínima diaria")
         )
       p3 <- grafico_gris("pr") +
+        geom_hline(yintercept = perc_historico$`pr_5%`) +
+        geom_hline(yintercept = perc_historico$`pr_95%`) +
         labs(x = "Años", y = "Lluvia (mm)") + 
         labs(
           title = paste("Total de precipitación anual")
@@ -139,6 +147,8 @@ server <- function(input,output) {
     } else if (input$loess == T) {  #con tendencia seleccionada
       p1 <- grafico("tasmax") +
         stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "tasmax")) +
+        geom_hline(yintercept = perc_historico$`tasmax_5%`) +
+        geom_hline(yintercept = perc_historico$`tasmax_95%`) +
         labs(x = "Años", y = "Temperatura (C)") + 
         labs(
           title = paste("Promedio de temperatura máxima diaria")
@@ -146,12 +156,16 @@ server <- function(input,output) {
       p2 <- grafico("tasmin") +
         labs(x = "Años", y = "Temperatura (C)") +
         stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "tasmin")) +
+        geom_hline(yintercept = perc_historico$`tasmin_5%`) +
+        geom_hline(yintercept = perc_historico$`tasmin_95%`) +
         labs(
           title = paste("Promedio de temperatura mínima diaria")
         )
-      p3 <- grafico("pr") +
+      p3 <- grafico("pr", "pr_5%", "pr_95%") +
         labs(x = "Años", y = "Lluvia (mm)") + 
         stat_smooth(data=seleccion, method="loess", level=0.8, se = F, aes_string(x = "aNo", y = "pr")) +
+        geom_hline(yintercept = perc_historico$`pr_5%`) +
+        geom_hline(yintercept = perc_historico$`pr_95%`) +
         labs(
           title = paste("Total de precipitación anual")
         )
@@ -179,16 +193,22 @@ server <- function(input,output) {
       grid_arrange_shared_legend(p1, p2, p4, p3, p5, p6, p7)
     } else {  #sin tendencia
     p1 <- grafico("tasmax") +
+      geom_hline(yintercept = perc_historico$`tasmax_5%`) +
+      geom_hline(yintercept = perc_historico$`tasmax_95%`) +
       labs(x = "Años", y = "Temperatura (C)") + 
       labs(
         title = paste("Promedio de temperatura máxima diaria")
       )
     p2 <- grafico("tasmin") +
+      geom_hline(yintercept = perc_historico$`tasmin_5%`) +
+      geom_hline(yintercept = perc_historico$`tasmin_95%`) +
       labs(x = "Años", y = "Temperatura (C)") +
       labs(
         title = paste("Promedio de temperatura mínima diaria")
       )
     p3 <- grafico("pr") +
+      geom_hline(yintercept = perc_historico$`pr_5%`) +
+      geom_hline(yintercept = perc_historico$`pr_95%`) +
       labs(x = "Años", y = "Lluvia (mm)") + 
       labs(
         title = paste("Total de precipitación anual")
