@@ -46,6 +46,7 @@ ui <- fluidPage(
                   min = 2000, max = 2100, value = c(2030, 2050), step = 5, sep = ""),
       
       checkboxInput("loess", "Mostrar línea de tendencia para los GCMs seleccionados.", value = F),
+      submitButton("Graficar"),
       br(),
       h5("Nota:"),
       p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio 'Skill of CMIP5 climate models in reproducing 20th century basic climate features in Central America' de Hidalgo y Alfaro (2015)."),
@@ -55,7 +56,7 @@ ui <- fluidPage(
       p("- Los puntos que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, mientras que el gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       br(),
       p("App elaborada en R-Shiny por Guillermo Durán, HIDROCEC-UNA."),
-      p("Última actualización 9-2-2018.")
+      p("Última actualización 11-2-2018.")
       ),
     
     mainPanel(
