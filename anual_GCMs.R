@@ -137,8 +137,16 @@ mensual_GCMs <- mensual_GCMs %>% rename(Modelo = Model)
 
 saveRDS(mensual_GCMs, "mensual_GCMs.rds")
 
+#media de datos históricos
+media_historico <- mensual_GCMs %>% 
+  filter(Scenario == "historical") %>% group_by(mes) %>% 
+  summarise(tasmax_media=median(tasmax_mes),
+            tasmin_media=median(tasmin_mes),
+            pr_media=median(pr_mes))
 
+saveRDS(media_historico, "media_historico_mensual.rds")
 
-ggplot(pr_mensual, aes(x=mes, y=pr_mes)) + geom_violin() + scale_y_log10()
+ggplot(pr_mensual, aes(x=mes, y=pr_mes)) + geom_violin() + scale_y_log10() + geom_point(data = media_historico, aes(x=mes, y=pr_media), shape = 18, size = 3)
 
 ggplot(tasmax_mensual, aes(x=mes,y=tasmax_mes)) + geom_violin() + stat_summary(fun.y=median, geom="point", size=2, color="red")
+

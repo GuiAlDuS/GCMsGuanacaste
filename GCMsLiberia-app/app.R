@@ -7,6 +7,7 @@ library(grid)
 anual_GCMs <- readRDS("data/anual_GCMs.rds")
 mensual_GCMs <- readRDS("data/mensual_GCMs.rds")
 perc_historico <- readRDS("data/perc_anual_GCMs.rds")
+media_historico <- readRDS("data/media_historico_mensual.rds")
 anual_GCMs$aNo <- as.integer(anual_GCMs$aNo)
 mensual_GCMs$aNo <- as.integer(mensual_GCMs$aNo)
 
@@ -52,11 +53,11 @@ ui <- fluidPage(
       p("- Los siete GCMs se escogieron con base en los mejores 30 GCMs del estudio 'Skill of CMIP5 climate models in reproducing 20th century basic climate features in Central America' de Hidalgo y Alfaro (2015)."),
       p("- Datos tomados del set de datos NEX-GDDP, con resolución espacial de 0.25° x 0.25° ~ 25km x 25km."),
       p("- Las líneas negras horizontales representan el 5 y 95 percentil de los datos históricos modelados (1950 a 2005)."),
+      p("- Los puntos a colores que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, los rombos negros son la media de las distribuciones de los datos históricos modelados (1950 a 2005). El gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       p("- Línea de tendencia calculada por medio de una regresión local (LOESS)."),
-      p("- Los puntos que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, mientras que el gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       br(),
       p("App elaborada en R-Shiny por Guillermo Durán, HIDROCEC-UNA."),
-      p("Última actualización 11-2-2018.")
+      p("Última actualización 12-2-2018.")
       ),
     
     mainPanel(
@@ -130,16 +131,19 @@ server <- function(input,output) {
           title = paste("Promedio del rango de temperatura diaria")
         )
       p5 <- grafico_mes_gris("tasmax_mes") +
+        geom_point(data = media_historico, aes(x=mes, y=tasmax_media), shape = 18, size = 3) +
         labs(x = "Mes", y = "Temperatura (C)") +
         labs(
           title = paste("Temperaturas máximas mensuales")
         )
       p6 <- grafico_mes_gris("tasmin_mes") + 
+        geom_point(data = media_historico, aes(x=mes, y=tasmin_media), shape = 18, size = 3) +
         labs(x = "Mes", y = "Temperatura (C)") +
         labs(
           title = paste("Temperaturas mínimas mensuales")
         )
-      p7 <- grafico_mes_gris("pr_mes") +
+      p7 <- grafico_mes_gris("pr_mes") + 
+        geom_point(data = media_historico, aes(x=mes, y=pr_media), shape = 18, size = 3) +
         labs(x = "Mes", y = "Lluvia (mm)") +
         labs(
           title = paste("Total de lluvias mensuales")
@@ -177,16 +181,19 @@ server <- function(input,output) {
           title = paste("Promedio del rango de temperatura diaria")
         )
       p5 <- grafico_mes("tasmax_mes") +
+        geom_point(data = media_historico, aes(x=mes, y=tasmax_media), shape = 18, size = 3) +
         labs(x = "Mes", y = "Temperatura (C)") +
         labs(
           title = paste("Temperaturas máximas mensuales")
         )
       p6 <- grafico_mes("tasmin_mes") + 
+        geom_point(data = media_historico, aes(x=mes, y=tasmin_media), shape = 18, size = 3) +
         labs(x = "Mes", y = "Temperatura (C)") +
         labs(
           title = paste("Temperaturas mínimas mensuales")
         )
       p7 <- grafico_mes("pr_mes") +
+        geom_point(data = media_historico, aes(x=mes, y=pr_media), shape = 18, size = 3) +
         labs(x = "Mes", y = "Lluvia (mm)") +
         labs(
           title = paste("Total de lluvias mensuales")
@@ -220,16 +227,19 @@ server <- function(input,output) {
         title = paste("Promedio del rango de temperatura diaria")
       )
     p5 <- grafico_mes("tasmax_mes") +
+      geom_point(data = media_historico, aes(x=mes, y=tasmax_media), shape = 18, size = 3) +
       labs(x = "Mes", y = "Temperatura (C)") +
       labs(
         title = paste("Temperaturas máximas mensuales")
       )
     p6 <- grafico_mes("tasmin_mes") + 
+      geom_point(data = media_historico, aes(x=mes, y=tasmin_media), shape = 18, size = 3) +
       labs(x = "Mes", y = "Temperatura (C)") +
       labs(
         title = paste("Temperaturas mínimas mensuales")
       )
     p7 <- grafico_mes("pr_mes") +
+      geom_point(data = media_historico, aes(x=mes, y=pr_media), shape = 18, size = 3) +
       labs(x = "Mes", y = "Lluvia (mm)") +
       labs(
         title = paste("Total de lluvias mensuales")
