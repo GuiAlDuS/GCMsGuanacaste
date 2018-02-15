@@ -150,3 +150,18 @@ ggplot(pr_mensual, aes(x=mes, y=pr_mes)) + geom_violin() + scale_y_log10() + geo
 
 ggplot(tasmax_mensual, aes(x=mes,y=tasmax_mes)) + geom_violin() + stat_summary(fun.y=median, geom="point", size=2, color="red")
 
+##leaflet
+library(leaflet)
+
+#coordenadas
+liberiaGCMs %>% select(Longitude, Latitude) %>% distinct(Longitude, Latitude)
+
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  setView(lng=-85.375, lat=10.625, zoom = 9) %>% 
+  addRectangles(
+    lng1=-85.625, lat1=10.875,
+    lng2=-85.125, lat2=10.375,
+    fillColor = "transparent")
+
+m

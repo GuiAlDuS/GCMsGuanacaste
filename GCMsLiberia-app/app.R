@@ -3,6 +3,7 @@ library(dplyr)
 library(ggplot2)
 library(gridExtra)
 library(grid)
+library(leaflet)
 
 anual_GCMs <- readRDS("data/anual_GCMs.rds")
 mensual_GCMs <- readRDS("data/mensual_GCMs.rds")
@@ -55,9 +56,16 @@ ui <- fluidPage(
       p("- Las líneas negras horizontales representan el 5 y 95 percentil de los datos históricos modelados (1950 a 2005)."),
       p("- Los puntos a colores que se muestran en los gráficos de distribuciones mensuales son la media de cada modelo, los rombos negros son la media de las distribuciones de los datos históricos modelados (1950 a 2005). El gráfico de violín incluye las distribuciones unidas de los modelos seleccionados."),
       p("- Línea de tendencia calculada por medio de una regresión local (LOESS)."),
+      p("- La extensión del área de la celda analizada se muestra en el mapa de abajo."),
+      leaflet() %>%
+        addTiles() %>%
+        setView(lng=-85.375, lat=10.625, zoom = 9) %>%
+        addRectangles(
+          lng1=-85.625, lat1=10.875,
+          lng2=-85.125, lat2=10.375),
       br(),
       p("App elaborada en R-Shiny por Guillermo Durán, HIDROCEC-UNA."),
-      p("Última actualización 12-2-2018.")
+      p("Última actualización 14-2-2018.")
       ),
     
     mainPanel(
