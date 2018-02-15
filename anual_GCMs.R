@@ -156,12 +156,12 @@ library(leaflet)
 #coordenadas
 liberiaGCMs %>% select(Longitude, Latitude) %>% distinct(Longitude, Latitude)
 
-m <- leaflet() %>%
+m <-leaflet() %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
-  setView(lng=-85.375, lat=10.625, zoom = 9) %>% 
+  setView(lng=-85.375, lat=10.625, zoom = 10) %>% 
   addRectangles(
-    lng1=-85.625, lat1=10.875,
-    lng2=-85.125, lat2=10.375,
+    lng1=-85.5, lat1=10.75,
+    lng2=-85.25, lat2=10.5,
     fillColor = "transparent")
 
 m

@@ -59,10 +59,10 @@ ui <- fluidPage(
       p("- La extensión del área de la celda analizada se muestra en el mapa de abajo."),
       leaflet() %>%
         addTiles() %>%
-        setView(lng=-85.375, lat=10.625, zoom = 9) %>%
+        setView(lng=-85.375, lat=10.625, zoom = 10) %>%
         addRectangles(
-          lng1=-85.625, lat1=10.875,
-          lng2=-85.125, lat2=10.375),
+          lng1=-85.5, lat1=10.75,
+          lng2=-85.25, lat2=10.5),
       br(),
       p("App elaborada en R-Shiny por Guillermo Durán, HIDROCEC-UNA."),
       p("Última actualización 14-2-2018.")
